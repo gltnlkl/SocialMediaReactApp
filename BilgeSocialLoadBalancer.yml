@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  bilgesocialloadbalancer
+spec:
+  selector:
+    app:  bilgesocialdeploy
+  type:  LoadBalancer
+  ports:
+  - name:  bilgeport
+    port:  80
+    targetPort:  3000
+

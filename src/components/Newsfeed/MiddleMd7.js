@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import Post from './Post'
-
-export default class MiddleMd7 extends Component {
+import postservice from '../../config/PostService'
+import {connect} from 'react-redux'
+import LoginStore from '../../stores/LoginStore'
+class MiddleMd7 extends Component {
     constructor(props){
         super(props)
     }
@@ -13,27 +15,37 @@ export default class MiddleMd7 extends Component {
         postList: []
     }
 
-    componentDidMount= ()=>{
+  async componentDidMount(){
         const data = {
-            "userid": "620eab9b4e13a042dee58dd9"
+            "token": LoginStore.getToken()
           };
 
-        fetch('http://localhost:8092/v1/post/findbyuserid', {
-            method: 'POST', // or 'PUT'
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    postList: data
-                })
-            })
-            .catch((error) => {
-            console.error('Error:', error);
-            });
+            try{ 
+                await fetch(postservice.findbyuserid, {
+                        method: 'POST', // or 'PUT'
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                        })
+                        .then(response => response.json()) 
+                        .then(data => { 
+                            if(data.status==200)                         
+                                this.setState({
+                                postList: data.result
+                                })             
+                            else{
+                                this.props.logout()
+                                console.log("Hata Oldu"+data.resultCode)
+                            }
+                        })
+
+            }catch(e){
+                console.log("post yükleme hatası...: "+e)
+                    this.props.logout()
+            }
+   
+            
     }
   render() {
     return (
@@ -70,11 +82,30 @@ export default class MiddleMd7 extends Component {
             </div>
 
             {
-                this.state.postList.map(
-                    post=> <Post key={post.id} data={post}/>)
+                this.state.postList===null
+                ? null
+                : this.state.postList.length>0
+                ? this.state.postList.map(
+                    post=> <Post key={post.id} data={post} />)
+                : null
             }
          
       </div>
     )
   }
 }
+
+const mapStateToProps = (state) => 
+({ 
+    loginstate: state.login
+})
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+      // dispatching plain actions
+      logout: () => dispatch({ type: 'SIGN_OUT' }),
+   
+    }
+  }
+
+export default connect(mapStateToProps,mapDispatchToProps)(MiddleMd7)

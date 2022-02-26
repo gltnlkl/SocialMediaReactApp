@@ -1,18 +1,23 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import ChatOnline from './ChatOnline'
+import ProfileStore from '../../stores/ProfileStore'
 
-export default class StaticMd3 extends Component {
+class StaticMd3 extends Component {
     constructor(props){
         super(props)
+        console.log(ProfileStore.getProfile())
     }
   render() {
+    let user = this.props.profileinfo
     return (
       
         <div className="col-md-3 static">
         <div className="profile-card">
             <img src="images/users/user-1.jpg" alt="user" className="profile-photo" />
-            <h5><a href="timeline.html" className="text-white">Sarah Cruiz</a></h5>
+            <h5><a href="timeline.html" className="text-white">{user?.firstname+' '+user?.lastname}</a></h5>
             <a href="#" className="text-white"><i className="ion ion-android-person-add"></i> 1,299 followers</a>
+            <button  className="btn btn-danger" onClick={()=>{this.props.logout()}}>Sign Out</button>
         </div>
         <ul className="nav-news-feed">
           <li><i className="icon ion-ios-paper"></i><div><a href="newsfeed.html">My Newsfeed</a></div></li>
@@ -28,3 +33,16 @@ export default class StaticMd3 extends Component {
     )
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    // dispatching plain actions
+    logout: () => dispatch({ type: 'SIGN_OUT' }),
+ 
+  }
+}
+const mapStateToProps = (state) => 
+({ 
+    profileinfo: state.profile
+})
+export default connect(mapStateToProps,mapDispatchToProps)(StaticMd3)

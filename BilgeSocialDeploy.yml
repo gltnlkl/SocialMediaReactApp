@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bilgesocialdeploy
+spec:
+  selector:
+    matchLabels:
+      app: bilgesocialdeploy
+  template:
+    metadata:
+      labels:
+        app: bilgesocialdeploy
+    spec:
+      containers:
+      - name: bilgesocial
+        image: nginx
+        ports:
+        - containerPort: 80
+        - containerPort: 3000
